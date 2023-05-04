@@ -1,0 +1,36 @@
+plugins {
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.google.guava:guava:31.1-jre'
+}
+
+application {
+    apply plugin: 'java'
+    version = '0.0.1-SNAPSHOT'
+    // 指定编码格式
+    [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'example.App'
+        )
+    }
+    from {
+        configurations.runtimeClasspath.findAll {
+            //打包所有libs目录中的jar文件
+            it.parent.equals(project.rootDir.path + '/libs') && it.name.endsWith(".jar")
+        }.collect {
+            println 'add ' + it.name
+            zipTree(it)
+        }
+    }
+}
